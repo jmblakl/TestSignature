@@ -50,7 +50,7 @@ public class Program
         var payloadBytes = Encoding.UTF8.GetBytes(orderedPayload);
         var hashedPayload = SHA256.HashData(payloadBytes);
 
-        return Encoding.UTF8.GetString(hashedPayload);
+        return Convert.ToHexStringLower(hashedPayload);
     }
 
     static string CreateCanonicalString<T>(string method, string path, Dictionary<string, string> queryParameters, Dictionary<string, string> headers, T? item)
@@ -59,20 +59,17 @@ public class Program
         var canonicalHeadersString = CreateCanonicalHeadersString(headers);
         var payload = HashPayload(item);
 
-        return $"{method}\n{path}" +
-        (string.IsNullOrWhiteSpace(canonicalQueryString) ? string.Empty : $"\n{canonicalQueryString}") +
-        (string.IsNullOrWhiteSpace(canonicalHeadersString) ? string.Empty : $"\n{canonicalHeadersString}") +
-        $"\n{payload}";
+        return $"{method}\n{path}\n{canonicalQueryString}\n{canonicalHeadersString}\n{payload}";
     }
 
     static string GenerateCanonicalSignature(string key, string data, DateTimeOffset timestamp)
     {
         var unix = timestamp.ToUnixTimeMilliseconds();
-        var finalString = $"{data}\n{unix}";
+        var finalString = $"{unix}\n{data}";
         var finalBytes = Encoding.UTF8.GetBytes(finalString);
         var keyBytes = Encoding.UTF8.GetBytes(key);
         var hash = HMACSHA256.HashData(keyBytes, finalBytes);
 
-        return Convert.ToHexString(hash);
+        return Convert.ToHexStringLower(hash);
     }
 }
