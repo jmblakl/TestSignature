@@ -6,28 +6,35 @@ public class Program
 {
     public static void Main(string[] args)
     {
+        var timestamp = DateTimeOffset.UtcNow;
+        //var timestamp = DateTimeOffset.FromUnixTimeMilliseconds(1739398219897);
         var canonicalString = CreateCanonicalString<object>(
             "POST",
             "/signature/validate",
             [],
-            [],
+            new Dictionary<string, string>()
+            {
+                //{"x-authorization-api-key","6Mi38PDHIi"},
+                //{"x-authorization-timestamp",timestamp.ToUnixTimeMilliseconds().ToString()}
+            },
             new
             {
-                accountUID = "xxxxx",
-                subAccountUID = "xxxxx",
-                customerPhoneNumber = "+12176225710"
+                accountUID = "555",
+                externalSubAccountUID = "123",
+                //subAccountUID = "123",
+                customerPhoneNumber = "+12176225710",
+                //apiKey = "6Mi38PDHIi",
+                //secretKey = "4qdJAItVs8"
             });
 
         Console.WriteLine($"Canonical String:\n{canonicalString}");
-        var timestamp = DateTimeOffset.FromUnixTimeMilliseconds(1739390054136);
-        var signature = GenerateCanonicalSignature("xxxxx", canonicalString, timestamp);
+        var signature = GenerateCanonicalSignature("4qdJAItVs8", canonicalString, timestamp);
 
         Console.WriteLine($"Signature:\n{signature}");
     }
 
     static string OrderJsonKeysAscending<T>(T? item)
     {
-        if (item == null) return string.Empty;
         return OrderedJsonSerializer.Serialize(item);
     }
 
