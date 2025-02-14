@@ -20,8 +20,7 @@ public class Program
             new
             {
                 accountUID = "555",
-                externalSubAccountUID = "123",
-                //subAccountUID = "123",
+                subAccountUID = "123",
                 customerPhoneNumber = "+12176225710",
                 //apiKey = "6Mi38PDHIi",
                 //secretKey = "4qdJAItVs8"
@@ -72,7 +71,7 @@ public class Program
     static string GenerateCanonicalSignature(string key, string data, DateTimeOffset timestamp)
     {
         var unix = timestamp.ToUnixTimeMilliseconds();
-        var finalString = $"{unix}\n{data}";
+        var finalString = $"{data}\n{unix}";
         var finalBytes = Encoding.UTF8.GetBytes(finalString);
         var keyBytes = Encoding.UTF8.GetBytes(key);
         var hash = HMACSHA256.HashData(keyBytes, finalBytes);
