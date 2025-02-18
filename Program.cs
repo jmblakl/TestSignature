@@ -6,28 +6,26 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        var timestamp = DateTimeOffset.UtcNow;
-        //var timestamp = DateTimeOffset.FromUnixTimeMilliseconds(1739398219897);
+        //var timestamp = DateTimeOffset.UtcNow;
+        var timestamp = DateTimeOffset.FromUnixTimeMilliseconds(1739795608000);
         var canonicalString = CreateCanonicalString<object>(
             "POST",
             "/signature/validate",
             [],
             new Dictionary<string, string>()
             {
-                //{"x-authorization-api-key","6Mi38PDHIi"},
-                //{"x-authorization-timestamp",timestamp.ToUnixTimeMilliseconds().ToString()}
+                {"x-authorization-api-key","123"},
+                {"x-authorization-timestamp",timestamp.ToUnixTimeMilliseconds().ToString()}
             },
             new
             {
-                accountUID = "555",
-                subAccountUID = "123",
-                customerPhoneNumber = "+12176225710",
-                //apiKey = "6Mi38PDHIi",
-                //secretKey = "4qdJAItVs8"
+                accountUID = "aaa",
+                subAccountUID = "bbb",
+                customerPhoneNumber = "+123456789"
             });
 
         Console.WriteLine($"Canonical String:\n{canonicalString}");
-        var signature = GenerateCanonicalSignature("4qdJAItVs8", canonicalString, timestamp);
+        var signature = GenerateCanonicalSignature("123", canonicalString, timestamp);
 
         Console.WriteLine($"Signature:\n{signature}");
     }
@@ -65,7 +63,17 @@ public class Program
         var canonicalHeadersString = CreateCanonicalHeadersString(headers);
         var payload = HashPayload(item);
 
-        return $"{method}\n{path}\n{canonicalQueryString}\n{canonicalHeadersString}\n{payload}";
+        if (!string.IsNullOrWhiteSpace(canonicalQueryString))
+        {
+            canonicalQueryString = $"\n{canonicalQueryString}";
+        }
+
+        if (!string.IsNullOrWhiteSpace(canonicalHeadersString))
+        {
+            canonicalHeadersString = $"\n{canonicalHeadersString}";
+        }
+
+        return $"{method}\n{path}{canonicalQueryString}{canonicalHeadersString}\n{payload}";
     }
 
     static string GenerateCanonicalSignature(string key, string data, DateTimeOffset timestamp)
